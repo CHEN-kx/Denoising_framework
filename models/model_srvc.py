@@ -3,6 +3,7 @@ from models.utils import *
 from models.common import *
 
 class SRVC(nn.Module):
+    #TODO: imagesize%5 = 0
     def __init__(self, cfg):
         super(SRVC, self).__init__()
 
