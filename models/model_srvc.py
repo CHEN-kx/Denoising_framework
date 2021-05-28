@@ -3,7 +3,6 @@ from models.utils import *
 from models.common import *
 
 class SRVC(nn.Module):
-    #TODO: imagesize%5 = 0
     def __init__(self, cfg):
         super(SRVC, self).__init__()
 
@@ -51,6 +50,8 @@ class SRVC(nn.Module):
 
         # 5*5 -> full
         x = self.b2s(x,B,C,H+pad_h,W+pad_w)
+        x = x[:,:,:H,:W]
+        
         if self.k==0:
             return self.pred_net(x)
         else:

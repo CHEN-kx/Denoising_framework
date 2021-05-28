@@ -1,6 +1,6 @@
 import os
 import numpy as np
-import skimage as io
+from skimage import io
 from tensorboardX import SummaryWriter
 
 def create_writer(name):

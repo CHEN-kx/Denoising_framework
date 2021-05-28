@@ -1,3 +1,4 @@
+import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -14,6 +15,25 @@ def valid_conv(in_channels, out_channels, kernel_size, bias=True):
     return nn.Conv2d(
         in_channels, out_channels, kernel_size,
         padding=0, bias=bias)
+
+def pool(x):
+    """ 2x2 max pool function """
+    return F.max_pool2d(x, 2, 2)
+
+def relu(x):
+    """ ReLU function """
+    return F.relu(x, inplace=True)
+
+def concat(a, b):
+    """ concat at dim 1 """
+    return torch.cat((a, b), 1)
+
+def upsample(x, target):
+    """ 2x2 upsample function """
+    if 2*x.shape[2]!=target.shape[2]:
+        return F.interpolate(x, size=(target.shape[2], target.shape[3]), mode='bilinear')
+    else:
+        return F.interpolate(x, scale_factor=2, mode='bilinear')
 
 def adaConv(input, kernel, bias=None):
     """ spatially variant conv """
@@ -56,7 +76,6 @@ def apply_kernel(x, kernel, k, normalize=True):
     x = F.unfold(x, kernel_size=k).view(n, c, k ** 2, h, w)  # (n,c,k*k,h,w)
     res = (x * kernel.unsqueeze(1)).sum(2, keepdim=False)  # (n,c,k*k,h,w)x(n,1,k*k,h,w)
     return res
-
 
 class Space2Batch(nn.Module):
     def __init__(self, kernel_size):

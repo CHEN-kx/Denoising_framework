@@ -3,7 +3,8 @@ from models.utils import *
 from models.common import *
 from models.backbone import ResNet
 
-class KPCN(nn.modules):
+class KPCN(nn.Module):
+    """ kpn ResNet model """
     def __init__(self, cfg):
         super(KPCN, self).__init__()
         norm_layer = get_norm_layer(cfg.norm_type)

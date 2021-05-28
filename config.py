@@ -1,5 +1,14 @@
 import os
 
+
+''' experiment config '''
+gpu = '3'
+mode = 'srvc'
+ckpt = ""
+name = "test_code" 
+save = os.path.join("results", name)
+
+
 ''' data config '''
 type = "diff" 
 data_path = '/nfs/ckx/denoising/kpcn/'
@@ -9,14 +18,6 @@ valid_data_path = os.path.join(data_path, "valid_data", type)
 patch_size = 128 
 batch_size = 12
 numworks = 12
-
-
-''' experiment config '''
-gpu = 0
-mode = 'bpn'
-ckpt = "/.pth"
-name = "" 
-save = os.path.join("results", name)
 
 
 ''' trainning config '''
@@ -38,7 +39,7 @@ n_blocks = 16
 
 
 ''' kpn model config '''
-k = 5
+k = 0
 
 
 ''' srvc model config '''

@@ -1,6 +1,7 @@
 import warnings
 warnings.filterwarnings("ignore")
 
+import os
 import torch
 import torch.optim as optim
 import time
@@ -14,6 +15,8 @@ from utils.utils import *
 from utils.visualize import *
 from data.dataloader import load_data
 from test import valid
+
+os.environ["CUDA_VISIBLE_DEVICES"] = cfg.gpu
 
 def train(data_train, data_valid, net, writer):
 
@@ -31,13 +34,13 @@ def train(data_train, data_valid, net, writer):
     for epoch in range(0, cfg.epoch_num):    
         # 1. training
         loss_epoch = 0
+        t_epoch = time.time()
         for data_idx, data_batch in enumerate(data_train):
             t = time.time()
             step += 1
             x_ft = data_batch[0].permute(cfg.permu).cuda()  # (b,h,w,c)->(b,c,h,w)
             x, ft = x_ft[:, :cfg.input_nc_x, :, :], x_ft[:, cfg.input_nc_x:, :, :]  # (b,c1,h,w),(b,c2,h,w)
             y_gt = data_batch[1].permute(cfg.permu).cuda()  # (b,3,h,w)
-
             if torch.max(x_ft) > cfg.inf:
                 continue
 
@@ -56,7 +59,7 @@ def train(data_train, data_valid, net, writer):
                 data_idx, len(data_train), epoch, cfg.epoch_num, cfg.type, loss.item(), time.time()-t))
 
             loss_epoch += loss.item()
-
+        print('First epoch time is %f:' %(time.time()-t_epoch))
         print('[%d/%d], type: %s, loss_epoch: %f' % (epoch, cfg.epoch_num, cfg.type, loss_epoch))
 
         # 2. testing, we use PSNR as metric
@@ -81,7 +84,6 @@ def train(data_train, data_valid, net, writer):
     print("Finish training: mode=%s\n" % args.mode, flush=True)
     print("Take %.3f seconds.\n" % (time.time() - start), flush=True)
 
-
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -92,7 +94,7 @@ if __name__ == '__main__':
     os.makedirs(cfg.save, exist_ok=True)
 
     print('Load data', flush=True)
-    data_train, data_valid = load_data(True), load_data(False)
+    data_train, data_valid = load_data(cfg, True), load_data(cfg, False)
     print('data length: ', len(data_train), len(data_valid))
     
     print("Build networks.", flush=True)
@@ -101,7 +103,6 @@ if __name__ == '__main__':
     print(net)
 
     writer = create_writer(cfg.name)
-    torch.cuda.set_device(cfg.gpu)
     shutil.copyfile('config.py', os.path.join(cfg.save, 'config.py'))
 
     train(data_train, data_valid, net, writer)
