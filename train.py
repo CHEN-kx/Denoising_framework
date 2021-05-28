@@ -60,6 +60,7 @@ def train(data_train, data_valid, net, writer):
 
             loss_epoch += loss.item()
         print('First epoch time is %f:' %(time.time()-t_epoch))
+        break
         print('[%d/%d], type: %s, loss_epoch: %f' % (epoch, cfg.epoch_num, cfg.type, loss_epoch))
 
         # 2. testing, we use PSNR as metric
@@ -81,7 +82,7 @@ def train(data_train, data_valid, net, writer):
                 'optimizer': optimizer.state_dict()
             }, is_best)        
 
-    print("Finish training: mode=%s\n" % args.mode, flush=True)
+    print("Finish training: mode=%s\n" % cfg.mode, flush=True)
     print("Take %.3f seconds.\n" % (time.time() - start), flush=True)
 
 if __name__ == '__main__':

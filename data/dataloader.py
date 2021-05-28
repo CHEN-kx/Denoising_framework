@@ -29,7 +29,8 @@ data_dict = {'diff':['X_diff', 'Y_diff', 'albedo'], 'spec':['X_spec', 'Y_spec'],
 class renderDataset(torch.utils.data.Dataset):
     def __init__(self, data_path, stage, type):
         self.data_path, self.stage = data_path, stage
-        self.patches = sorted(os.listdir(self.data_path))
+        self.data_list = sorted(os.listdir(self.data_path))
+        self.patches = [torch.load(os.path.join(self.data_path, i)) for i in self.data_list]
         self.patch_num = len(self.patches) 
         self.data_type = data_dict[type][:2] if self.stage is 'train' else data_dict[type]
         
@@ -37,8 +38,7 @@ class renderDataset(torch.utils.data.Dataset):
         return self.patch_num       
 
     def __getitem__(self, idx):
-        patch_path = os.path.join(self.data_path, self.patches[idx])
-        patch_name = self.patches[idx].split('.')[0]
-        patch = to_torch_tensors(torch.load(patch_path))
+        patch = to_torch_tensors(self.patches[idx])
+        patch_name = self.data_list[idx].split('.')[0]
         data = [patch[i] for i in self.data_type]
         return data if self.stage is 'train' else (data, patch_name)
